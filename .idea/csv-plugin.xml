@@ -3,14 +3,21 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="\copyPokedex.csv">
+        <entry key="\files\Pokedex.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="\files\Pokedex.csv">
+        <entry key="\files\TypeAdvantage.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\files\skills.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
