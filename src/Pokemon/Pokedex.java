@@ -1,113 +1,135 @@
 package Pokemon;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
-public class Fight {
+public abstract class Pokedex {
+    //    Order in the CSV File Pokedex!
+    //    ID,Name,Form,Type1,Type2,
+    //    Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed,Generation
+    public final String name, form, type1, type2;
+    public final int id, total, maxHp, atk, def, spAtk, spDef, speed, gen;
+    public int hp;
 
-    String myAbility1, myAbility2, enemyAbility1, enemyAbility2;
+    // Order in Skills.Csv
+    // Id , Form , Name , Ability 1, Ability 2
+    public final String[] ability = new String[2];
 
-    public static void fight(Pokemon trainer, Pokemon enemy) throws InterruptedException, IOException {
-        status(trainer,enemy);
+     public Pokedex(int id) throws IOException {
+        BufferedReader pokedex = new BufferedReader(new FileReader("files/Pokedex.csv"));
+        BufferedReader abilityReader = new BufferedReader(new FileReader("files/skills.csv"));
+        int size = 0;
+        while (id != size) {
+            pokedex.readLine();
+            abilityReader.readLine();
+            size++;
+        }
+        String input = pokedex.readLine();
+        String[] value = input.split(",");
+        String skill = abilityReader.readLine();
+        String[] skills = skill.split(",");
 
-        Random rng = new Random();
-        Scanner sc = new Scanner(System.in);
-        int use, dmg;
-        while (trainer.getHp() > 0 || enemy.getHp() > 0) {
-            System.out.println("\nWhich Skill do you want to Use?");
-            do {
-                use = sc.nextInt();
-                dmg = dmgCalculation(trainer, enemy);
-                switch (use) {
-                    case 1 -> System.out.println(trainer.getName() + " attacks with " + trainer.getAbility1() + ".\n" +
-                            trainer.getName() + " deals " + dmg + " Dmg!");
-                    case 2 -> System.out.println(trainer.getName() + " attacks with " + trainer.getAbility2() + ".\n" +
-                            trainer.getName() + " deals " + dmg + " Dmg!");
-                    default -> System.out.println("Error! Use 1 or 2!");
-                }
-            } while (use < 0 || use > 2);
-
-            if (dmg > 0) {
-                enemy.setHp(enemy.getHp() - dmg);
-                if (dmg > 50) {
-                    System.out.println("Critical Hit!");
-                }
-                if (dmg > 25) {
-                    System.out.println("Good Hit");
-                }
-            }
-            if (enemy.getHp() <= 0) {
-                System.out.println("Enemy Defeated");
-                return;
-            }
-            System.out.println("Enemy Turn!");
-            Thread.sleep(1000);
-
-            use = rng.nextInt(1, 3);
-            dmg = dmgCalculation(enemy, trainer);
-            switch (use) {
-                case 1 -> System.out.println(enemy.getName() + " attacks with " + enemy.getAbility1() + ".\n" +
-                        enemy.getName() + " deals " + dmg + " Dmg!");
-                case 2 -> System.out.println(enemy.getName() + " attacks with " + enemy.getAbility2() + ".\n" +
-                        enemy.getName() + " deals " + dmg + " Dmg!");
-            }
-
-            if (dmg > 0) {
-                trainer.setHp(trainer.getHp() - dmg);
-                if (dmg > 25) {
-                    System.out.println("Good Hit");
-                }
-                if (dmg > 50) {
-                    System.out.println("Critical Hit!");
-                }
-            }
-            if (trainer.getHp() <= 0) {
-                System.out.println("You Lost the Fight!");
-                return;
-            }
-
-            Thread.sleep(1000);
-            status(trainer, enemy);
+        this.name = value[1];
+        this.form = value[2];
+        this.type1 = value[3];
+        this.type2 = value[4];
+        this.id = Integer.parseInt(value[0]);
+        this.total = Integer.parseInt(value[5]);
+        this.maxHp = Integer.parseInt(value[6]);
+        this.hp = Integer.parseInt(value[6]);
+        this.atk = Integer.parseInt(value[7]);
+        this.def = Integer.parseInt(value[8]);
+        this.spAtk = Integer.parseInt(value[9]);
+        this.spDef = Integer.parseInt(value[10]);
+        this.speed = Integer.parseInt(value[11]);
+        this.gen = Integer.parseInt(value[12]);
+        this.ability[0] = skills[3];
+        try {
+            this.ability[1] = skills[4];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            this.ability[1] = "";
         }
     }
-    public static void status(Pokemon trainer, Pokemon enemy) {
-        System.out.printf("%s %s %d %s %s %s %d %s %s %s %s %s",
-                trainer.getName(),"(",trainer.getHp(),")",
-                enemy.getName(),"(",enemy.getHp(),")",
-                "\n", Arrays.toString(trainer.getAbility()),
-                "\n", Arrays.toString(enemy.getAbility()));
+    public Pokedex(String name) throws IOException {
+        BufferedReader pokedex = new BufferedReader(new FileReader("files/Pokedex.csv"));
+        BufferedReader abilityReader = new BufferedReader(new FileReader("files/skills.csv"));
+        String[] value, skills;
+        do {
+            String input = pokedex.readLine();
+            value = input.split(",");
+            String skill = abilityReader.readLine();
+            skills = skill.split(",");
+        } while (!value[1].equalsIgnoreCase(name) || skills[2].equalsIgnoreCase(name));
+
+        this.name = value[1];
+        this.form = value[2];
+        this.type1 = value[3];
+        this.type2 = value[4];
+        this.id = Integer.parseInt(value[0]);
+        this.total = Integer.parseInt(value[5]);
+        this.maxHp = Integer.parseInt(value[6]);
+        this.hp = Integer.parseInt(value[6]);
+        this.atk = Integer.parseInt(value[7]);
+        this.def = Integer.parseInt(value[8]);
+        this.spAtk = Integer.parseInt(value[9]);
+        this.spDef = Integer.parseInt(value[10]);
+        this.speed = Integer.parseInt(value[11]);
+        this.gen = Integer.parseInt(value[12]);
+        this.ability[0] = skills[3];
+        try {
+            this.ability[1] = skills[4];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            this.ability[1] = "";
+        }
     }
 
-    public static int dmgCalculation(Pokemon trainer, Pokemon enemy) throws IOException {
-        Random rng = new Random();
-        double attAdvantage1 = 0, defAdvantage1 = 0, attAdvantage2 = 0, defAdvantage2 = 0;
-        attAdvantage1 = typeAdvantage1(trainer, enemy);
-        defAdvantage1 = typeAdvantage1(enemy, trainer);
-        attAdvantage2 = typeAdvantage2(trainer, enemy);
-        defAdvantage2 = typeAdvantage2(enemy, trainer);
-        return (int)(trainer.getAtk() * rng.nextDouble(1) * attAdvantage1 * attAdvantage2
-                - enemy.getDef() * rng.nextDouble(0.5) * defAdvantage1 * defAdvantage2);
+    // Extra for the different Forms !
+    public Pokedex(String name, String form) throws IOException {
+        BufferedReader pokedex = new BufferedReader(new FileReader("files/Pokedex.csv"));
+        BufferedReader abilityReader = new BufferedReader(new FileReader("files/skills.csv"));
+        String[] value, skills;
+        do {
+            String input = pokedex.readLine();
+            value = input.split(",");
+            String skill = abilityReader.readLine();
+            skills = skill.split(",");
+        } while (!value[2].equalsIgnoreCase(form) || skills[1].equalsIgnoreCase(form));
+
+        this.name = value[1];
+        this.form = value[2];
+        this.type1 = value[3];
+        this.type2 = value[4];
+        this.id = Integer.parseInt(value[0]);
+        this.total = Integer.parseInt(value[5]);
+        this.maxHp = Integer.parseInt(value[6]);
+        this.hp = Integer.parseInt(value[6]);
+        this.atk = Integer.parseInt(value[7]);
+        this.def = Integer.parseInt(value[8]);
+        this.spAtk = Integer.parseInt(value[9]);
+        this.spDef = Integer.parseInt(value[10]);
+        this.speed = Integer.parseInt(value[11]);
+        this.gen = Integer.parseInt(value[12]);
+        this.ability[0] = skills[3];
+        try {
+            this.ability[1] = skills[4];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            this.ability[1] = "";
+        }
     }
 
     // Implementing Type Advantages below !!
-    public static double typeAdvantage1(Pokemon trainer, Pokemon enemy) throws IOException {
-        BufferedReader typeAdvantage = new BufferedReader(new FileReader("files/TypeAdvantage.csv"));
-
+    public double typeAdvantage1(Pokemon trainer, Pokemon enemy) throws IOException {
         // TypeAdvantage Csv Order
         // BaseType vs,Normal,Fire,Water,Electric,Grass,Ice,Fighting,Poison,
         // Ground,Flying,Psychic,Bug,Rock,Ghost,Dragon,Dark,Steel,Fairy
+        BufferedReader typeAdvantage = new BufferedReader(new FileReader("files/TypeAdvantage.csv"));
 
         String[] type;
         double advantage = 0;
         do {
             String input = typeAdvantage.readLine();
             type = input.split(",");
-        } while (!type[0].equalsIgnoreCase(trainer.getType1()) );
+        } while (!type[0].equalsIgnoreCase(trainer.getType1()));
         // Vs Normal
         if (enemy.getType1().equalsIgnoreCase("Normal")) {
             advantage = Double.parseDouble(type[1]);
@@ -182,23 +204,24 @@ public class Fight {
         }
         return advantage;
     }
-    public static double typeAdvantage2(Pokemon trainer, Pokemon enemy) throws IOException {
-        BufferedReader typeAdvantage = new BufferedReader(new FileReader("files/TypeAdvantage.csv"));
-        // TypeAdvantage Csv Order
-        // BaseType vs,Normal,Fire,Water,Electric,Grass,Ice,Fighting,Poison,
-        // Ground,Flying,Psychic,Bug,Rock,Ghost,Dragon,Dark,Steel,Fairy
 
+    public double typeAdvantage2(Pokemon trainer, Pokemon enemy) throws IOException {
         // If there is No second Type return 1 because *1 stays the same !
-        if (trainer.getType2().equalsIgnoreCase(" ")) {
+        if (trainer.getType2().equalsIgnoreCase("")) {
             return 1;
         }
 
+        // TypeAdvantage Csv Order
+        // BaseType vs,Normal,Fire,Water,Electric,Grass,Ice,Fighting,Poison,
+        // Ground,Flying,Psychic,Bug,Rock,Ghost,Dragon,Dark,Steel,Fairy
+        BufferedReader typeAdvantage = new BufferedReader(new FileReader("files/TypeAdvantage.csv"));
         String[] type;
         double advantage = 0;
         do {
             String input = typeAdvantage.readLine();
             type = input.split(",");
         } while (!type[0].equalsIgnoreCase(trainer.getType2()));
+
         // Vs Normal
         if (enemy.getType2().equalsIgnoreCase("Normal")) {
             advantage = Double.parseDouble(type[1]);
@@ -275,4 +298,16 @@ public class Fight {
             return 1;
         } else return advantage;
     }
+    // Calculating the Dmg
+    public int dmgCalculation(Pokemon trainer, Pokemon enemy) throws IOException {
+        Random rng = new Random();
+        double attAdvantage1, defAdvantage1, attAdvantage2, defAdvantage2;
+        attAdvantage1 = typeAdvantage1(trainer, enemy);
+        attAdvantage2 = typeAdvantage2(trainer, enemy);
+        defAdvantage1 = typeAdvantage1(enemy, trainer);
+        defAdvantage2 = typeAdvantage2(enemy, trainer);
+        return (int) ((trainer.getAtk() * rng.nextDouble(1.01) * attAdvantage1 * attAdvantage2)
+                - (enemy.getDef() * rng.nextDouble(0.501) * defAdvantage1 * defAdvantage2));
+    }
+
 }

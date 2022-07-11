@@ -1,23 +1,20 @@
 package Pokemon;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
-import static Pokemon.Fight.fight;
-import static Pokemon.Fight.status;
-
-public class main {
+public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
 
         Random rng = new Random();
-        Scanner sc = new Scanner(System.in);
 
-        Pokemon myPokemon = new Pokemon(rng.nextInt(0,906));
+        Pokemon myPokemon = new Pokemon("Necrozma","Ultra Necrozma");
         Pokemon enemy = new Pokemon(rng.nextInt(0, 906));
 
-       fight(myPokemon, enemy);
+        System.out.println(myPokemon);
+        System.out.println("--------------!Fight!---------------");
 
+
+        myPokemon.fight(enemy);
     }
 }

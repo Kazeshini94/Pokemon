@@ -1,128 +1,108 @@
 package Pokemon;
 
 import java.io.*;
-import java.util.Arrays;
+import java.util.*;
 
-public class Pokemon {
-    //    Order in the CSV File Pokedex!
-    //    ID,Name,Form,Type1,Type2,
-    //    Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed,Generation
-    private final String name, form, type1, type2;
-    private final int id, total, atk, def, spAtk, spDef, speed, gen;
-    private int hp;
 
-    // Order in Skills.Csv
-    // Id , Form , Name , Ability 1, Ability 2
-    private final String[] ability = new String[2];
+public class Pokemon extends Pokedex {
 
-    BufferedReader reader = new BufferedReader(new FileReader("files/Pokedex.csv"));
-    BufferedReader abilityReader = new BufferedReader(new FileReader("files/skills.csv"));
-
-    // Constructor through  Pokemon ID !!
+    // Constructors implemented from Pokedex
     public Pokemon(int id) throws IOException {
-        int size = 0;
-        while (id != size) {
-            reader.readLine();
-            abilityReader.readLine();
-            size++;
-        }
-        String input = reader.readLine();
-        String[] value = input.split(",");
-        String skill = abilityReader.readLine();
-        String[] skills = skill.split(",");
-
-        this.name = value[1];
-        this.form = value[2];
-        this.type1 = value[3];
-        this.type2 = value[4];
-        this.id = Integer.parseInt(value[0]);
-        this.total = Integer.parseInt(value[5]);
-        this.hp = Integer.parseInt(value[6]);
-        this.atk = Integer.parseInt(value[7]);
-        this.def = Integer.parseInt(value[8]);
-        this.spAtk = Integer.parseInt(value[9]);
-        this.spDef = Integer.parseInt(value[10]);
-        this.speed = Integer.parseInt(value[11]);
-        this.gen = Integer.parseInt(value[12]);
-        this.ability[0] = skills[3];
-        try {
-            this.ability[1] = skills[4];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            this.ability[1] = "";
-        }
+        super(id);
     }
-
-    // through Pokemon Name !!
     public Pokemon(String name) throws IOException {
-        String[] value, skills;
-        do {
-            String input = reader.readLine();
-            value = input.split(",");
-            String skill = abilityReader.readLine();
-            skills = skill.split(",");
-        } while (!value[1].equalsIgnoreCase(name) || skills[2].equalsIgnoreCase(name));
-
-        this.name = value[1];
-        this.form = value[2];
-        this.type1 = value[3];
-        this.type2 = value[4];
-        this.id = Integer.parseInt(value[0]);
-        this.total = Integer.parseInt(value[5]);
-        this.hp = Integer.parseInt(value[6]);
-        this.atk = Integer.parseInt(value[7]);
-        this.def = Integer.parseInt(value[8]);
-        this.spAtk = Integer.parseInt(value[9]);
-        this.spDef = Integer.parseInt(value[10]);
-        this.speed = Integer.parseInt(value[11]);
-        this.gen = Integer.parseInt(value[12]);
-        this.ability[0] = skills[3];
-        try {
-            this.ability[1] = skills[4];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            this.ability[1] = "";
-        }
+        super(name);
     }
-
-    // Extra for the different Forms !
     public Pokemon(String name, String form) throws IOException {
-        String[] value, skills;
-        do {
-            String input = reader.readLine();
-            value = input.split(",");
-            String skill = abilityReader.readLine();
-            skills = skill.split(",");
-        } while (!value[1].equalsIgnoreCase(name) && !value[2].equalsIgnoreCase(form));
+        super(name, form);
+    }
 
-        this.name = value[1];
-        this.form = value[2];
-        this.type1 = value[3];
-        this.type2 = value[4];
-        this.id = Integer.parseInt(value[0]);
-        this.total = Integer.parseInt(value[5]);
-        this.hp = Integer.parseInt(value[6]);
-        this.atk = Integer.parseInt(value[7]);
-        this.def = Integer.parseInt(value[8]);
-        this.spAtk = Integer.parseInt(value[9]);
-        this.spDef = Integer.parseInt(value[10]);
-        this.speed = Integer.parseInt(value[11]);
-        this.gen = Integer.parseInt(value[12]);
-        this.ability[0] = skills[3];
-        try {
-            this.ability[1] = skills[4];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            this.ability[1] = "";
+    // Methods
+    public void fight(Pokemon enemy) throws InterruptedException, IOException {
+        // Shows Name / Hp  + skills from trainer pokemon & enemy pokemon
+        status(enemy);
+
+        Random rng = new Random();
+        Scanner sc = new Scanner(System.in);
+        int use = 0, dmg = 0;
+        while (this.hp > 0 || enemy.getHp() > 0) {
+            System.out.println("\nWhich Skill do you want to Use?");
+            do {
+                try {
+                    use = sc.nextInt();
+                    dmg = dmgCalculation(this, enemy);
+                    switch (use) {
+                        case 1 -> System.out.println(this.name + " attacks with " + this.ability[0] + ".\n"
+                                + this.name + " deals " + dmg + " Dmg!");
+                        case 2 -> System.out.println(this.name + " attacks with " + this.ability[1] + ".\n"
+                                + this.name + " deals " + dmg + " Dmg!");
+                        default -> throw new InputMismatchException();
+                    }
+                } catch (InputMismatchException e) {
+                    System.out.println("Error! Use 1 or 2!");
+                    fight(enemy);
+                }
+            } while (use < 0 || use > 2);
+
+            if (dmg > 0) {
+                enemy.setHp(enemy.getHp() - dmg);
+                if (dmg > 50) {
+                    System.out.println("Critical Hit!");
+                } else if (dmg > 25) {
+                    System.out.println("Good Hit");
+                }
+            }
+            if (enemy.getHp() <= 0) {
+                System.out.println("Enemy Defeated");
+                return;
+            }
+            System.out.println("Enemy Turn!");
+            Thread.sleep(500);
+
+            use = rng.nextInt(1, 3);
+            dmg = dmgCalculation(enemy, this);
+            switch (use) {
+                case 1 -> System.out.println(enemy.getName() + " attacks with " + enemy.getAbility1() + ".\n" +
+                        enemy.getName() + " deals " + dmg + " Dmg!");
+                case 2 -> System.out.println(enemy.getName() + " attacks with " + enemy.getAbility2() + ".\n" +
+                        enemy.getName() + " deals " + dmg + " Dmg!");
+            }
+
+            if (dmg > 0) {
+                this.hp -= dmg;
+                if (dmg > 50) {
+                    System.out.println("Critical Hit!");
+                } else if (dmg > 25) {
+                    System.out.println("Good Hit");
+                }
+            }
+
+            if (this.hp <= 0) {
+                System.out.println("You Lost the Fight!");
+                return;
+            }
+
+            Thread.sleep(1000);
+            status(enemy);
         }
     }
 
-    public void fight(Pokemon trainer, Pokemon enemy) {
-
+    // Simple Overview  Name | Hp | Skills
+    public void status(Pokemon enemy) {
+        System.out.printf("%s %s %d %s %d %s %s %s %s %d %s %d %s %s %6s %s %5s",
+                this.form.equalsIgnoreCase("") ? this.name : this.form,
+                "(", this.hp, "|", this.maxHp, ")"," Vs ",
+                enemy.getForm().equalsIgnoreCase("") ? enemy.getName() : enemy.getForm(),
+                "(", enemy.getHp(), "|", enemy.getMaxHp(), ")",
+                "\nMy Skills:", Arrays.toString(this.ability),
+                "\nEnemy Skills: ", Arrays.toString(enemy.getAbility()) );
     }
 
     @Override
     public String toString() {
-        return String.format("%16s %d %s %19s %s %s %17s %s %s %11d %s %12d %s %9d %s %d %s %9d %s %d %s %6d %s %d %s %20s",
+        return String.format("%16s %d %s %24s %s  %16s %s %s %11d %s %12d %s %9d %s %d %s %9d %s %d %s %6d %s %d %s %20s",
                 "Pokemon", id,
-                "\nName: ", name, form,
+                "\nName: ", (form.equalsIgnoreCase(" "))? name: form,
                 "\nType: ", type1, type2,
                 "\nGeneration: ", gen,
                 "\nStatPoints: ", total,
@@ -146,7 +126,6 @@ public class Pokemon {
     public String getName() {
         return name;
     }
-
     public String getForm() {
         return form;
     }
@@ -154,7 +133,6 @@ public class Pokemon {
     public String getType1() {
         return type1;
     }
-
     public String getType2() {
         return type2;
     }
@@ -165,6 +143,10 @@ public class Pokemon {
 
     public int getTotal() {
         return total;
+    }
+
+    public int getMaxHp() {
+        return maxHp;
     }
 
     public void setHp(int hp) {
